@@ -1,5 +1,20 @@
 import streamlit as st
+import requests
 
+def call_iris_api(data):
+    api_endpoint = "http://127.0.0.1:8085/iris-predict"
+    response = requests.post(api_endpoint, json=data)
+    response.raise_for_status()
+    if response.status_code == 200:
+        return response
+    
+def call_flowers_api(image_file):
+    api_endpoint = "http://127.0.0.1:8085/flowers-predict"
+    response = requests.post(api_endpoint, files={"image_file": image_file})
+    response.raise_for_status()
+    if response.status_code == 200:
+        return response
+    
 def render_iris_form():
     st.header("Iris Model")
 
@@ -10,6 +25,13 @@ def render_iris_form():
 
     is_clicked = st.button("Make Prediction")
     if is_clicked:
+        response = call_iris_api({
+            "sepal_length": sepal_length,
+            "sepal_width": sepal_width,
+            "petal_length": petal_length,
+            "petal_width": petal_width,
+        })
+        st.write(response.json())
         st.balloons()
 
 
@@ -25,6 +47,8 @@ def render_flowers_form():
         )
         is_clicked = st.button("Make Prediction")
         if is_clicked:
+            response = call_flowers_api(image_file)
+            st.write(response.json())
             st.balloons()
 
 def app():
