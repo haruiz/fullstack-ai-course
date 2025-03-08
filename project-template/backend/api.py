@@ -4,15 +4,15 @@ from io import BytesIO
 from PIL import Image
 from fastapi import FastAPI, Request, File, UploadFile
 import tensorflow as tf
+from joblib import load
+import keras
 
 def load_iris_model():
-    from joblib import load
     model = load("models/iris-model/sklearn/model.pk")
     return model
 
 
 def load_flowers_model():
-    import keras
     model = keras.models.load_model("models/flowers-model/model.keras")
     return model
 
@@ -49,6 +49,8 @@ async def predict_iris(request: Request):
 
 @app.post("/flowers-predict")
 async def predict_flowers(request: Request, image_file: UploadFile = File(...)):
+    flowers_model = request.app.state.model_garden["flowers"]
+
     image_bytes: bytes = await image_file.read()
     image_stream = BytesIO(image_bytes)
     pil_image = Image.open(image_stream)
@@ -56,7 +58,7 @@ async def predict_flowers(request: Request, image_file: UploadFile = File(...)):
     image_tensor = tf.convert_to_tensor(pil_image, dtype=tf.float32)
     image_tensor = tf.expand_dims(image_tensor, axis=0)
     image_tensor = image_tensor / 255.0
-    flowers_model = request.app.state.model_garden["flowers"]
+    
     activation_scores = flowers_model.predict(image_tensor)
     predictions = tf.nn.softmax(activation_scores).numpy().tolist()
     labels = ['dandelion', 'daisy', 'tulips', 'sunflowers', 'roses']

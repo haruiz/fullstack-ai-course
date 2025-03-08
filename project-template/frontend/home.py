@@ -1,15 +1,30 @@
 import streamlit as st
 import requests
+import json
+
+API_ENDPOINT = "http://127.0.0.1:8085"
 
 def call_iris_api(data):
-    api_endpoint = "http://127.0.0.1:8085/iris-predict"
-    response = requests.post(api_endpoint, json=data)
-    response.raise_for_status()
-    if response.status_code == 200:
-        return response
+    # api_endpoint = f"{API_ENDPOINT}/iris-predict"
+    
+    # response = requests.post(api_endpoint, json=data)
+    # response.raise_for_status()
+    # if response.status_code == 200:
+    #     return response
+    url = "http://127.0.0.1:5000/invocations"
+    payload = json.dumps({
+    "instances": [
+        [data["sepal_length"], data["sepal_width"], data["petal_length"], data["petal_width"]]
+        ]
+    })
+    headers = {
+    'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", url, headers=headers, data=payload)
+    return response
     
 def call_flowers_api(image_file):
-    api_endpoint = "http://127.0.0.1:8085/flowers-predict"
+    api_endpoint = f"{API_ENDPOINT}/flowers-predict"
     response = requests.post(api_endpoint, files={"image_file": image_file})
     response.raise_for_status()
     if response.status_code == 200:
@@ -17,7 +32,6 @@ def call_flowers_api(image_file):
     
 def render_iris_form():
     st.header("Iris Model")
-
     sepal_length = st.number_input("Sepal Length", min_value=0.0, max_value=10.0, value=5.0)
     sepal_width = st.number_input("Sepal Width", min_value=0.0, max_value=10.0, value=3.0)
     petal_length = st.number_input("Petal Length", min_value=0.0, max_value=10.0, value=1.0)
