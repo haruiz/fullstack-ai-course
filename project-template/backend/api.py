@@ -16,8 +16,6 @@ def load_flowers_model():
     model = keras.models.load_model("models/flowers-model/model.keras")
     return model
 
-
-
 @asynccontextmanager
 async def life_cycle(app: FastAPI):
     app.state.model_garden = {}
