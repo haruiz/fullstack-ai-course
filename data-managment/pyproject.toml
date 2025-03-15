@@ -1,0 +1,16 @@
+[project]
+name = "data-managment"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "keras>=3.9.0",
+    "keras-core>=0.1.7",
+    "keras-cv>=0.9.0",
+    "matplotlib>=3.10.1",
+    "notebook>=7.3.3",
+    "simpy>=4.1.1",
+    "tensorflow>=2.19.0",
+    "tensorflow-metal>=1.2.0",
+]
